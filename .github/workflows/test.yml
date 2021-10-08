@@ -59,3 +59,58 @@ jobs:
             echo "Invalid retun code: ${{ steps.runTrnsportFail.outputs.return_code }} (should be 6)"
             exit 1
           fi
+      - name: Register trnsport model
+        uses: ./update-model
+        with:
+          url: ${{ secrets.ENGINE_URL }}
+          namespace: ${{ secrets.ENGINE_NS }}
+          username: ${{ secrets.ENGINE_USER }}
+          password: ${{ secrets.ENGINE_PASSWORD }}
+          model: 'trnsport'
+          run: 'trnsport.gms'
+          data: '${{ github.workspace }}/trnsport.zip'
+      - name: Run trnsport with registered model
+        uses: ./run-job
+        with:
+          url: ${{ secrets.ENGINE_URL }}
+          namespace: ${{ secrets.ENGINE_NS }}
+          username: ${{ secrets.ENGINE_USER }}
+          password: ${{ secrets.ENGINE_PASSWORD }}
+          model: 'trnsport'
+      - name: Update trnsport model
+        uses: ./update-model
+        with:
+          url: ${{ secrets.ENGINE_URL }}
+          namespace: ${{ secrets.ENGINE_NS }}
+          username: ${{ secrets.ENGINE_USER }}
+          password: ${{ secrets.ENGINE_PASSWORD }}
+          model: 'trnsport'
+          run: 'trnsport.gms'
+          arguments: 'imnotvalid=a'
+      - name: Run trnsport with registered model
+        id: runTrnsportRegisteredFail
+        uses: ./run-job
+        with:
+          url: ${{ secrets.ENGINE_URL }}
+          namespace: ${{ secrets.ENGINE_NS }}
+          username: ${{ secrets.ENGINE_USER }}
+          password: ${{ secrets.ENGINE_PASSWORD }}
+          model: 'trnsport'
+          fail_on_error: 'no'
+      - name: Remove trnsport model
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: '${{ secrets.ENGINE_URL }}/namespaces/${{ secrets.ENGINE_NS }}/models/trnsport'
+          method: 'DELETE'
+          username: ${{ secrets.ENGINE_USER }}
+          password: ${{ secrets.ENGINE_PASSWORD }}
+      - name: Check return code of model with bad cl argument
+        run: |
+          if [ -z "${{ steps.runTrnsportRegisteredFail.outputs.token }}" ]; then
+            echo "Empty token"
+            exit 1
+          fi
+          if [[ "${{ steps.runTrnsportRegisteredFail.outputs.return_code }}" != "6" ]]; then
+            echo "Invalid retun code: ${{ steps.runTrnsportRegisteredFail.outputs.return_code }} (should be 6)"
+            exit 1
+          fi

@@ -1,0 +1,45 @@
+name: 'Update GAMS model'
+description: 'Update a GAMS model on GAMS Engine'
+author: 'GAMS Development Corp.'
+inputs:
+  url:
+    description: 'URL to Engine API (e.g. https://example.com/api)'
+    required: true
+  namespace:
+    description: 'Name of the namespace where model will be executed'
+    required: true
+    default: 'global'
+  username:
+    description: 'Name of the Engine user (requires write permissions in the namespace)'
+    required: false
+    default: 'admin'
+  password:
+    description: 'Password of the user'
+    required: false
+  token:
+    description: 'JWT token to use (will be used instead of username/password if provided)'
+    required: false
+  model:
+    description: 'Name of model (default: name of repository)'
+    required: false
+  run:
+    description: 'Name of the main gms file with its extension. Will use model + .gms if not provided.'
+    required: true
+  arguments:
+    description: 'Command line arguments to use (comma-separated)'
+    required: false
+  inex_string:
+    description: 'Optional JSON string to filter the contents of the result zip file'
+    required: false
+  data:
+    description: 'Absolute path to zip file containing model files'
+    required: false
+  text_entries:
+    description: 'Text entries to register (comma-separated)'
+    required: false
+  stream_entries:
+    description: 'Stream entries to register (comma-separated)'
+    required: false
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

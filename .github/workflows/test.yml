@@ -1,0 +1,61 @@
+name: Test
+
+on: [push, pull_request]
+
+defaults:
+   run:
+     shell: bash
+
+jobs:
+  run-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+      - name: Create trnsport
+        run: |
+          echo 'UEsDBBQAAAAIAHqHSFOQ4t+6dAMAANcGAAAMABwAdHJuc3BvcnQuZ21zVVQJAAPoXGBh6lxgYXV4CwABBPUBAAAEFAAAAHVUTXPbNhC981fsITOUMwwl23Xi2KNDmno8TZvUtZTeIXIpwQYBhgCrj1/ftyD1YbflQSKBxb73dh/2TdDBMH2ieausb1wbVNDO0kPrFoZrGs0fv80e/nicZ7O7P6fnZ0nyxtk5b0IyX2lPzRBWaVt6UmRY+UCFw49f6abRdkm+WHHZASSsVKCaOfik5R+dbrlmG3AMq6p9Znm1JfmuaYzmuF6pIrgWH3mSJL8oG3Z6mdE9/ZzR55VqArd0mV/m9Kul37Vl1QrxZavqWpAl290msPWQhBQPrbYFB8j7bvXf3HodtjjA3md02MvoG6/pC3Z5m9H5x/eXwI5iK9fWnenrg8+SfdHqBZekLT6C0gZvN8mj85C1UiajR7o7Er24QZnvP32d0bwTUcpE3rIiO989t6mn+06XnAOQaVZoJNKVLvYkH7lcO1fSZxBHYmU0OFmthOf1deTJZFAIsl29gARaa2PIOqlwKFZoAcgJ34DAhXPPtOBCdVhzlax5TgpXx7Yg22+8Xbu29DcxJ4rbHIubUXjpmMEK2b7fiIFXqiqaJZlxSIhIU1ooa6U5jUE7fUpj8qwCTJgReWXflZqXjsYS/UTpYIyUhmdMltfvtq59zqhY6UItHZi4hp8VjW+T5EGBH6Pccl6N9JkANqqQTkNiBAULVKBQnn2aHBMPNOTj8mpy2DhlRe8nE1CTvcXoCblLrsVkBweD8n+l3nOW1BdXJ6kHCRFzcoo5SJLn4sNVlDZXqC+VI51FZO2DgmP7ZroOJHEDIbHW5hS8f44EDog9gsSdCO8B86v+5Tz/MPxfJy/r8Druevj/CTxnhTLwSkVp1bJerkK8H85gEQMDF0HKE1/2vAfOKNTHycsuUjHIPZitHy6vRb9On94mw8kpVW/7mo3PJ5MJkv+lcPdQSpG0GdLLsBLX048OBtFBxs+LRu56pWlwQZnX1hdK/v84paLHYdRg4tAemzZYvQOYnJf8UVUPUXIlN9gtnriIh6rOFhIXicTpuI3GdguMDOz3S7ijtQ5ixcHkMbw3aPSqB5ivtvRvzwpFIZDnPYUdTXmKtPUolicbuvC2r9YZog8scETinrKhlCi4mcaLh6gD+BClT6KW03iFEPXVlXxSUrhAYWaJDbwzkHfc6bwMDtPALxZid/K1ExztoXlLmxwzd5PXt8k/UEsBAh4DFAAAAAgAeodIU5Di37p0AwAA1wYAAAwAGAAAAAAAAQAAAKSBAAAAAHRybnNwb3J0Lmdtc1VUBQAD6FxgYXV4CwABBPUBAAAEFAAAAFBLBQYAAAAAAQABAFIAAAC6AwAAAAA=' | base64 -d > trnsport.zip
+      - name: Run trnsport
+        id: runTrnsport
+        uses: ./run-job
+        with:
+          url: ${{ secrets.ENGINE_URL }}
+          namespace: ${{ secrets.ENGINE_NS }}
+          username: ${{ secrets.ENGINE_USER }}
+          password: ${{ secrets.ENGINE_PASSWORD }}
+          run: 'trnsport.gms'
+          fail_on_error: 'no'
+          model_data: '${{ github.workspace }}/trnsport.zip'
+      - name: Check return code
+        run: |
+          if [ -z "${{ steps.runTrnsport.outputs.token }}" ]; then
+            echo "Empty token"
+            exit 1
+          fi
+          if [[ "${{ steps.runTrnsport.outputs.return_code }}" != "0" ]]; then
+            echo "Invalid retun code: ${{ steps.runTrnsport.outputs.return_code }} (should be 0)"
+            exit 1
+          fi
+      - name: Run trnsport with invalid cl args
+        id: runTrnsportFail
+        uses: ./run-job
+        with:
+          url: ${{ secrets.ENGINE_URL }}
+          namespace: ${{ secrets.ENGINE_NS }}
+          username: ${{ secrets.ENGINE_USER }}
+          password: ${{ secrets.ENGINE_PASSWORD }}
+          arguments: 'imnotvalid=a'
+          run: 'trnsport.gms'
+          fail_on_error: 'no'
+          model_data: '${{ github.workspace }}/trnsport.zip'
+      - name: Check return code
+        run: |
+          if [ -z "${{ steps.runTrnsportFail.outputs.token }}" ]; then
+            echo "Empty token"
+            exit 1
+          fi
+          if [[ "${{ steps.runTrnsportFail.outputs.return_code }}" != "6" ]]; then
+            echo "Invalid retun code: ${{ steps.runTrnsportFail.outputs.return_code }} (should be 6)"
+            exit 1
+          fi

@@ -1,0 +1,71 @@
+name: 'Run GAMS job'
+description: 'Run GAMS job on GAMS Engine'
+author: 'GAMS Development Corp.'
+inputs:
+  url:
+    description: 'URL to Engine API (e.g. https://example.com/api)'
+    required: true
+  namespace:
+    description: 'Name of the namespace where model will be executed'
+    required: true
+    default: 'global'
+  username:
+    description: 'Name of the Engine user (requires write and execute permissions in the namespace)'
+    required: false
+    default: 'admin'
+  password:
+    description: 'Password of the user'
+    required: false
+  token:
+    description: 'JWT token to use (will be used instead of username/password if provided)'
+    required: false
+  model:
+    description: 'Name of model (default: name of repository)'
+    required: false
+  run:
+    description: 'Name of the main gms file with its extension. Will use model + .gms if not provided.'
+    required: false
+  arguments:
+    description: 'Command line arguments to use (comma-separated)'
+    required: false
+  inex_string:
+    description: 'Optional JSON string to filter the contents of the result zip file'
+    required: false
+  labels:
+    description: 'Labels that will be attached to the job in key=value format'
+    required: false
+  model_data:
+    description: 'Absolute path to zip file containing model files'
+    required: false
+  data:
+    description: 'Absolute path to zip file containing data'
+    required: false
+  text_entries:
+    description: 'Text entries to register (comma-separated)'
+    required: false
+  stream_entries:
+    description: 'Stream entries to register (comma-separated)'
+    required: false
+  dep_tokens:
+    description: 'Tokens of jobs on which this job depends (comma-separated). The order defines the order in which the results of dependent jobs are extracted.'
+    required: false
+  fail_on_error:
+    description: 'Whether the action should fail if the GAMS return code is not 0 (yes/no)'
+    required: true
+    default: 'yes'
+  delete_results:
+    description: 'Whether results should be deleted when job finishes (yes/no)'
+    required: true
+    default: 'yes'
+  timeout:
+    description: 'Timeout in seconds before actions fails (0 to disable)'
+    required: true
+    default: '600'
+outputs:
+  token:
+    description: 'The token of the job'
+  return_code:
+    description: 'The return code of the GAMS process (see here: https://www.gams.com/latest/docs/UG_GAMSReturnCodes.html)' 
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

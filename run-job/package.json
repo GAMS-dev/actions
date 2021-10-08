@@ -1,0 +1,28 @@
+{
+  "name": "run-job",
+  "version": "0.0.0",
+  "description": "Run GAMS job on GAMS Engine",
+  "main": "index.js",
+  "scripts": {
+    "build": "ncc build src/index.js -o dist",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GAMS-dev/actions.git"
+  },
+  "author": "GAMS Development Corp.",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/GAMS-dev/actions/issues"
+  },
+  "homepage": "https://github.com/GAMS-dev/actions#readme",
+  "devDependencies": {
+    "@actions/core": "^1.6.0"
+  },
+  "dependencies": {
+    "@zeit/ncc": "^0.22.3",
+    "axios": "^0.22.0",
+    "form-data": "^4.0.0"
+  }
+}

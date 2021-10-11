@@ -22,7 +22,7 @@ jobs:
           namespace: ${{ secrets.ENGINE_NS }}
           username: ${{ secrets.ENGINE_USER }}
           password: ${{ secrets.ENGINE_PASSWORD }}
-          model: 'trnsport_${GITHUB_REF}'
+          model: 'trnsport_${{ github.event.release.tag_name }}'
           run: 'trnsport.gms'
           model_data: '${{ github.workspace }}/model.zip'
 ```

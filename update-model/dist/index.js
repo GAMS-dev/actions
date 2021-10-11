@@ -4587,7 +4587,7 @@ const updateModel = async () => {
       })
   } catch (error) {
     if (error.response && error.response.data) {
-      if (error.response.status === 404 && error.response.data.message.startsWith('Model')) {
+      if (error.response.status === 404 && error.response.data.message && error.response.data.message.startsWith('Model')) {
         if (!!core.getInput('data')) {
           formData.append('data', fs.createReadStream(core.getInput('data')))
         }

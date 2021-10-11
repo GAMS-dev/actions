@@ -53,7 +53,7 @@ const runGams = async () => {
     }
     ['labels', 'dep_tokens', 'text_entries', 'stream_entries', 'arguments'].forEach(el => {
       if (!!core.getInput(el)) {
-        const value = el.trim().split(',');
+        const value = core.getInput(el).trim().split(',');
         for (let i = 0; i < value.length; i++) {
           jobSubmissionForm.append(el, value[i].trim());
         }
